@@ -3,7 +3,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { AuthResponse, AuthUser, LoginRequest, RegisterRequest } from './auth.models';
+import { AuthResponse, AuthUser, LoginRequest, MessageResponse, RegisterRequest } from './auth.models';
 
 const TOKEN_KEY = 'racecenter_auth_token';
 const USER_KEY = 'racecenter_auth_user';
@@ -17,16 +17,18 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this.tokenSignal());
   readonly user = computed(() => this.userSignal());
 
-  register(payload: RegisterRequest): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/register`, payload)
-      .pipe(tap((response) => this.persistSession(response)));
+  register(payload: RegisterRequest): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${environment.apiUrl}/auth/register`, payload);
   }
 
   login(payload: LoginRequest): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${environment.apiUrl}/auth/login`, payload)
       .pipe(tap((response) => this.persistSession(response)));
+  }
+
+  verifyEmail(token: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${environment.apiUrl}/auth/verify-email`, { token });
   }
 
   logout(): void {

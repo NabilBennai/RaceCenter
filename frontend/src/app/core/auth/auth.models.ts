@@ -3,6 +3,7 @@ export interface AuthUser {
   email: string;
   username: string;
   role: 'USER' | 'MODERATOR' | 'ADMIN';
+  emailVerified: boolean;
 }
 
 export interface AuthResponse {
@@ -20,4 +21,8 @@ export interface RegisterRequest {
 export interface LoginRequest {
   email: string;
   password: string;
+}
+
+export interface MessageResponse {
+  message: string;
 }
