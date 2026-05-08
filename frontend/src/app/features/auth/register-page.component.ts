@@ -2,9 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 
 import { AuthService } from '../../core/auth/auth.service';
+import { NotificationService } from '../../core/notifications/notification.service';
 
 @Component({
   selector: 'app-register-page',
@@ -17,7 +17,7 @@ export class RegisterPageComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly toastr = inject(ToastrService);
+  private readonly notifications = inject(NotificationService);
   protected readonly isLoading = signal(false);
   protected readonly hidePassword = signal(true);
   protected readonly hidePasswordConfirm = signal(true);
@@ -37,10 +37,9 @@ export class RegisterPageComponent {
     confirmPassword: ['', [Validators.required]],
   });
 
-  protected readonly passwordsMismatch = computed(() => {
-    const raw = this.form.getRawValue();
-    return raw.password !== raw.confirmPassword;
-  });
+  protected readonly passwordsMismatch = computed(
+    () => this.form.getRawValue().password !== this.form.getRawValue().confirmPassword,
+  );
 
   protected submit(): void {
     if (this.form.invalid || this.passwordsMismatch() || this.isLoading()) {
@@ -51,13 +50,10 @@ export class RegisterPageComponent {
     const { email, username, password } = this.form.getRawValue();
     this.isLoading.set(true);
     this.authService.register({ email, username, password }).subscribe({
-      next: () => {
-        this.toastr.success('Compte créé avec succès');
-        this.router.navigate(['/dashboard']);
-      },
-      error: (error) => {
-        this.toastr.error(error?.error?.message ?? 'Impossible de créer le compte');
-        this.isLoading.set(false);
+      next: (response) => {
+        this.authService.logout();
+        this.notifications.success(response.message);
+        this.router.navigate(['/login']);
       },
       complete: () => this.isLoading.set(false),
     });

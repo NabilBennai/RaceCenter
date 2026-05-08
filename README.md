@@ -216,3 +216,15 @@ docker compose down
 - refresh token
 - vérification e-mail
 - reset password
+
+---
+
+## US-009 - Verification e-mail (mise a jour)
+
+- Endpoint backend: `POST /api/auth/verify-email`.
+- A l'inscription, un e-mail de verification est envoye.
+- Le lien pointe vers `http://localhost:4200/verify-email?token=...`.
+- Le frontend a une page de verification avec etat succes/erreur.
+- Docker Compose inclut `mailpit` pour les tests locaux:
+  - SMTP: `localhost:1025`
+  - UI: `http://localhost:8025`

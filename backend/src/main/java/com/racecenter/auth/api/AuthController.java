@@ -8,8 +8,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.racecenter.auth.api.dto.AuthResponse;
+import com.racecenter.auth.api.dto.ForgotPasswordRequest;
 import com.racecenter.auth.api.dto.LoginRequest;
+import com.racecenter.auth.api.dto.MessageResponse;
+import com.racecenter.auth.api.dto.RefreshTokenRequest;
+import com.racecenter.auth.api.dto.ResetPasswordRequest;
 import com.racecenter.auth.api.dto.RegisterRequest;
+import com.racecenter.auth.api.dto.VerifyEmailRequest;
 import com.racecenter.auth.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -26,12 +31,32 @@ public class AuthController {
 
 	@PostMapping("/register")
 	@ResponseStatus(HttpStatus.CREATED)
-	public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
+	public MessageResponse register(@Valid @RequestBody RegisterRequest request) {
 		return authService.register(request);
 	}
 
 	@PostMapping("/login")
 	public AuthResponse login(@Valid @RequestBody LoginRequest request) {
 		return authService.login(request);
+	}
+
+	@PostMapping("/refresh")
+	public AuthResponse refresh(@Valid @RequestBody RefreshTokenRequest request) {
+		return authService.refresh(request);
+	}
+
+	@PostMapping("/verify-email")
+	public MessageResponse verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+		return authService.verifyEmail(request.token());
+	}
+
+	@PostMapping("/forgot-password")
+	public MessageResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+		return authService.forgotPassword(request.email());
+	}
+
+	@PostMapping("/reset-password")
+	public MessageResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+		return authService.resetPassword(request.token(), request.newPassword());
 	}
 }
