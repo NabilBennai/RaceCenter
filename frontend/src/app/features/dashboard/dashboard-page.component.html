@@ -1,0 +1,18 @@
+<section class="dashboard-shell">
+  <div class="dashboard-card">
+    <h1 class="text-2xl font-bold text-white">Bienvenue {{ authService.user()?.username }}</h1>
+    <p class="mt-3 text-slate-100">
+      Authentification active. Cette page est protégée par `AuthGuard`.
+    </p>
+    <div class="dashboard-metrics">
+      <div class="metric">
+        <p class="metric-label">Statut session</p>
+        <p class="metric-value">Actif</p>
+      </div>
+      <div class="metric">
+        <p class="metric-label">Profil API</p>
+        <p class="metric-value">{{ profileEmail() ?? 'Chargement...' }}</p>
+      </div>
+    </div>
+  </div>
+</section>

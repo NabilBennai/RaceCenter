@@ -1,0 +1,45 @@
+.dashboard-shell {
+  min-height: calc(100dvh - 64px);
+  padding: 2rem 1.25rem 3rem;
+}
+
+.dashboard-card {
+  max-width: 860px;
+  margin: 0 auto;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 1rem;
+  background: linear-gradient(140deg, rgb(15 23 42 / 0.92), rgb(30 41 59 / 0.78));
+  padding: 1.5rem;
+}
+
+.dashboard-metrics {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+@media (min-width: 720px) {
+  .dashboard-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.metric {
+  border: 1px solid rgb(148 163 184 / 0.2);
+  border-radius: 0.85rem;
+  background: rgb(15 23 42 / 0.55);
+  padding: 0.9rem;
+}
+
+.metric-label {
+  color: rgb(148 163 184);
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.metric-value {
+  color: rgb(226 232 240);
+  font-size: 0.95rem;
+  font-weight: 600;
+  word-break: break-word;
+}

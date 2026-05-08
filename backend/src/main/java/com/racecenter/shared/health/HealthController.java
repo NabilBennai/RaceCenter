@@ -14,9 +14,7 @@ public class HealthController {
 
 	@GetMapping("/health")
 	public ResponseEntity<Map<String, Object>> health() {
-		return ResponseEntity.ok(Map.of(
-				"status", "OK",
-				"service", "racecenter-backend",
-				"timestamp", Instant.now().toString()));
+		return ResponseEntity
+				.ok(Map.of("status", "OK", "service", "racecenter-backend", "timestamp", Instant.now().toString()));
 	}
 }
