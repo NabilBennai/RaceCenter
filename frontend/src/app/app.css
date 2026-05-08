@@ -1,0 +1,30 @@
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  background: rgb(7 10 18 / 0.9);
+  backdrop-filter: blur(16px);
+  color: white;
+}
+
+.brand {
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.status-card,
+.feature-card {
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: linear-gradient(135deg, rgb(15 23 42 / 0.95), rgb(30 41 59 / 0.78));
+  color: white;
+}
+
+.feature-card {
+  min-height: 150px;
+}
