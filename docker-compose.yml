@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: racecenter-postgres
+    environment:
+      POSTGRES_DB: racecenter
+      POSTGRES_USER: racecenter
+      POSTGRES_PASSWORD: racecenter
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U racecenter -d racecenter"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:

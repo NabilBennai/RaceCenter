@@ -1,0 +1,82 @@
+<mat-toolbar class="toolbar">
+  <span class="brand">{{ title() }}</span>
+  <span class="spacer"></span>
+  <a mat-button href="#features">Fonctionnalités</a>
+  <a mat-flat-button color="primary" href="http://localhost:8080/api/health">API Health</a>
+</mat-toolbar>
+
+<main class="min-h-screen bg-slate-950 text-slate-50">
+  <section
+    class="mx-auto grid max-w-6xl gap-8 px-6 py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center"
+  >
+    <div class="space-y-8">
+      <mat-chip-set aria-label="Statut Sprint 0">
+        <mat-chip highlighted>Spring Boot 4</mat-chip>
+        <mat-chip highlighted>Angular 21</mat-chip>
+        <mat-chip highlighted>PostgreSQL</mat-chip>
+      </mat-chip-set>
+
+      <div class="space-y-5">
+        <p class="text-sm font-semibold uppercase tracking-[0.45em] text-red-400">
+          F1 · Football · Pronostics
+        </p>
+        <h1 class="max-w-3xl text-5xl font-black tracking-tight sm:text-6xl">
+          La base technique de RaceCenter est prête.
+        </h1>
+        <p class="max-w-2xl text-lg leading-8 text-slate-300">
+          Cette page d’accueil temporaire valide le layout Angular, TailwindCSS et Angular Material
+          pendant que l’API REST Spring Boot expose le point de santé du sprint 0.
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <a mat-flat-button color="primary" href="http://localhost:8080/api/health">Tester l’API</a>
+        <a mat-stroked-button href="https://github.com/" target="_blank" rel="noreferrer"
+          >Préparer le backlog</a
+        >
+      </div>
+    </div>
+
+    <mat-card class="status-card">
+      <mat-card-header>
+        <mat-card-title>Configuration locale</mat-card-title>
+        <mat-card-subtitle
+          >Environnement {{ isDevelopment() ? 'développement' : 'production' }}</mat-card-subtitle
+        >
+      </mat-card-header>
+      <mat-card-content>
+        <dl class="mt-6 grid gap-4 text-sm">
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <dt class="text-slate-400">API REST</dt>
+            <dd class="mt-1 font-mono text-slate-100">{{ apiUrl() }}</dd>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <dt class="text-slate-400">Base de données</dt>
+            <dd class="mt-1 font-mono text-slate-100">PostgreSQL via Docker Compose</dd>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <dt class="text-slate-400">Migration initiale</dt>
+            <dd class="mt-1 font-mono text-slate-100">Flyway V1__init_schema.sql</dd>
+          </div>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <section id="features" class="mx-auto grid max-w-6xl gap-4 px-6 pb-16 md:grid-cols-3">
+    <mat-card class="feature-card">
+      <mat-card-title>Pronostics</mat-card-title>
+      <mat-card-content>Préparation des modules football et Formule 1.</mat-card-content>
+    </mat-card>
+    <mat-card class="feature-card">
+      <mat-card-title>Ligues privées</mat-card-title>
+      <mat-card-content>Architecture prête pour les invitations et classements.</mat-card-content>
+    </mat-card>
+    <mat-card class="feature-card">
+      <mat-card-title>Notifications</mat-card-title>
+      <mat-card-content>Stack prévue pour les e-mails et le temps réel.</mat-card-content>
+    </mat-card>
+  </section>
+
+  <router-outlet />
+</main>

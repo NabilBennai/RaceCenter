@@ -12,17 +12,15 @@ RaceCenter est une application full-stack qui centralise l’expérience sportiv
 - la Formule 1
 - le football
 
-La plateforme permet aux utilisateurs de :
+La plateforme permettra aux utilisateurs de suivre des événements sportifs, réaliser des pronostics, rejoindre des ligues privées, consulter des classements, partager des setups F1, recevoir des notifications et interagir avec d’autres passionnés.
 
-- suivre des matchs et des Grands Prix
-- réaliser des pronostics
-- rejoindre des ligues privées
-- consulter des classements
-- partager des setups F1
-- recevoir des notifications et des e-mails
-- interagir avec d’autres passionnés
+Le sprint 0 met en place la base technique du projet avec :
 
-Ce projet est conçu pour pratiquer une stack moderne avec Spring Boot 4, Angular 21, PostgreSQL, JWT, WebSocket, Docker et l’envoi d’e-mails.
+- un backend Spring Boot 4 exposant une API REST
+- un frontend Angular 21 avec TailwindCSS et Angular Material
+- une base PostgreSQL locale via Docker Compose
+- une migration initiale Flyway
+- des commandes de build et de test documentées
 
 ---
 
@@ -33,14 +31,11 @@ Ce projet est conçu pour pratiquer une stack moderne avec Spring Boot 4, Angula
 - Java 25
 - Spring Boot 4
 - Spring Security
-- JWT Authentication
 - Spring Data JPA
 - PostgreSQL
 - Flyway
 - Spring Mail
-- WebSocket
-- Docker
-- Maven
+- Maven Wrapper
 
 ### Frontend
 
@@ -51,171 +46,155 @@ Ce projet est conçu pour pratiquer une stack moderne avec Spring Boot 4, Angula
 - RxJS
 - Angular Signals
 - Chart.js
+- ngx-toastr
 
-### Infrastructure
+### Infrastructure locale
 
-- Vercel pour le frontend
-- Render pour le backend
-- Neon ou Supabase pour PostgreSQL
-- Brevo ou Resend pour les e-mails
-- GitHub Actions pour la CI/CD
-
----
-
-## Fonctionnalités principales
-
-### Authentification
-
-- inscription
-- connexion
-- déconnexion
-- JWT
-- refresh token
-- vérification d’e-mail
-- mot de passe oublié
-- réinitialisation du mot de passe
-- rôles utilisateur, modérateur et admin
-
-### Football
-
-- calendrier des matchs
-- détails des matchs
-- classements
-- statistiques équipes
-- pronostics score exact
-- pronostics vainqueur
-- ligues privées entre amis
-
-### Formule 1
-
-- calendrier F1
-- détails des Grands Prix
-- classements pilotes
-- classements constructeurs
-- pronostics podium
-- pronostics pole position
-- pronostics meilleur tour
-- prédictions DNF
-
-### Partage de setups F1
-
-- création de setups
-- partage par circuit
-- setups pluie/sec
-- votes
-- commentaires
-- classement des meilleurs setups
-
-### Notifications et e-mails
-
-- e-mail de bienvenue
-- vérification du compte
-- reset password
-- confirmation de pronostic
-- invitation de ligue
-- rappel avant match ou course
-- notifications temps réel via WebSocket
-
-### Administration
-
-- gestion utilisateurs
-- bannissements
-- gestion des rôles
-- modération commentaires
-- statistiques globales
-- notifications globales
-
----
-
-## Architecture
-
-```txt
-Frontend Angular 21
-        ↓
-API REST Spring Boot 4
-        ↓
-Base PostgreSQL
-
-+ WebSocket
-+ SMTP
-+ APIs externes sportives
-+ Redis optionnel
-```
-
----
-
-## APIs externes prévues
-
-### Formule 1
-
-- OpenF1 API
-- Ergast API
-
-### Football
-
-- API-Football
-- TheSportsDB
+- Docker Compose
+- PostgreSQL 18 Alpine
 
 ---
 
 ## Structure du projet
 
 ```txt
-racecenter/
- ├── backend/
- ├── frontend/
- └── docs/
-     └── conception-technique.md
+RaceCenter/
+ ├── backend/                 # API REST Spring Boot 4
+ │   ├── src/main/java/com/racecenter/
+ │   │   ├── config/          # Configuration Spring Security
+ │   │   └── shared/health/   # Endpoint de santé
+ │   └── src/main/resources/
+ │       └── db/migration/    # Migrations Flyway
+ ├── frontend/                # Application Angular 21
+ │   └── src/app/             # Layout temporaire Sprint 0
+ ├── docs/                    # Documents de conception
+ ├── docker-compose.yml       # PostgreSQL local
+ └── README.md
 ```
+
+---
+
+## Prérequis
+
+- Java 25
+- Node.js compatible Angular 21 (`^20.19.0 || ^22.12.0 || >=24.0.0`)
+- npm
+- Docker et Docker Compose pour PostgreSQL
 
 ---
 
 ## Lancer le projet localement
 
-### Backend
+### 1. Base PostgreSQL
+
+```bash
+docker compose up -d postgres
+```
+
+La base locale est créée avec les identifiants suivants :
+
+```env
+POSTGRES_DB=racecenter
+POSTGRES_USER=racecenter
+POSTGRES_PASSWORD=racecenter
+```
+
+### 2. Backend
 
 ```bash
 cd backend
 ./mvnw spring-boot:run
 ```
 
-Variables d’environnement nécessaires :
+Variables d’environnement configurables :
 
 ```env
-SPRING_DATASOURCE_URL=
-SPRING_DATASOURCE_USERNAME=
-SPRING_DATASOURCE_PASSWORD=
-JWT_SECRET=
-MAIL_HOST=
-MAIL_PORT=
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/racecenter
+SPRING_DATASOURCE_USERNAME=racecenter
+SPRING_DATASOURCE_PASSWORD=racecenter
+MAIL_HOST=localhost
+MAIL_PORT=1025
 MAIL_USERNAME=
 MAIL_PASSWORD=
+```
+
+Endpoint de santé :
+
+```bash
+curl http://localhost:8080/api/health
+```
+
+Réponse attendue :
+
+```json
+{
+  "status": "OK",
+  "service": "racecenter-backend",
+  "timestamp": "..."
+}
+```
+
+### 3. Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+L’application Angular est disponible sur :
+
+```txt
+http://localhost:4200
+```
+
+La configuration API de développement est définie dans `frontend/src/environments/environment.development.ts` et pointe vers :
+
+```txt
+http://localhost:8080/api
+```
+
+---
+
+## Commandes utiles
+
+### Backend
+
+```bash
+cd backend
+./mvnw test
+./mvnw clean package
 ```
 
 ### Frontend
 
 ```bash
 cd frontend
-npm install
-ng serve
+npm run build
+npm test -- --watch=false
 ```
 
-Variable d’environnement :
+### Docker Compose
 
-```env
-NG_APP_API_URL=http://localhost:8080/api
+```bash
+docker compose up -d postgres
+docker compose ps
+docker compose down
 ```
 
 ---
 
-## Déploiement gratuit prévu
+## Sprint 0 livré
 
-```txt
-Angular 21 → Vercel
-Spring Boot 4 → Render
-PostgreSQL → Neon
-E-mails → Brevo ou Resend
-```
+- structure `backend/`, `frontend/`, `docs/`
+- `.gitignore` racine
+- backend Spring Boot 4 avec dépendances Web, Security, JPA, PostgreSQL, Flyway, Validation et Mail
+- endpoint public `GET /api/health`
+- configuration datasource PostgreSQL par variables d’environnement
+- migration Flyway initiale `V1__init_schema.sql`
+- frontend Angular 21 standalone avec page d’accueil temporaire
+- TailwindCSS et Angular Material configurés
+- Docker Compose PostgreSQL local
 
 ---
 
@@ -237,38 +216,3 @@ E-mails → Brevo ou Resend
 - refresh token
 - vérification e-mail
 - reset password
-
-### Phase 3 — Football
-
-- matchs
-- classements
-- pronostics
-- ligues privées
-
-### Phase 4 — Formule 1
-
-- calendrier
-- standings
-- pronostics
-- Race Weekend Center
-
-### Phase 5 — Communauté
-
-- setups
-- commentaires
-- votes
-- notifications
-
-### Phase 6 — Déploiement
-
-- Docker
-- GitHub Actions
-- Render
-- Vercel
-- Neon
-
----
-
-## Licence
-
-MIT
