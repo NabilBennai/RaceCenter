@@ -8,6 +8,7 @@ export interface AuthUser {
 
 export interface AuthResponse {
   accessToken: string;
+  refreshToken: string;
   tokenType: string;
   user: AuthUser;
 }
@@ -25,4 +26,8 @@ export interface LoginRequest {
 
 export interface MessageResponse {
   message: string;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
 }

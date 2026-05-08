@@ -3,9 +3,16 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { AuthResponse, AuthUser, LoginRequest, MessageResponse, RegisterRequest } from './auth.models';
+import {
+  AuthResponse,
+  AuthUser,
+  LoginRequest,
+  MessageResponse,
+  RegisterRequest,
+} from './auth.models';
 
 const TOKEN_KEY = 'racecenter_auth_token';
+const REFRESH_TOKEN_KEY = 'racecenter_refresh_token';
 const USER_KEY = 'racecenter_auth_user';
 
 @Injectable({ providedIn: 'root' })
@@ -35,6 +42,7 @@ export class AuthService {
     this.tokenSignal.set(null);
     this.userSignal.set(null);
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
   }
 
@@ -42,10 +50,25 @@ export class AuthService {
     return this.tokenSignal();
   }
 
+  refreshToken(): string | null {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  }
+
+  refreshAccessToken(): Observable<AuthResponse> {
+    const refreshToken = this.refreshToken();
+    if (!refreshToken) {
+      throw new Error('No refresh token');
+    }
+    return this.http
+      .post<AuthResponse>(`${environment.apiUrl}/auth/refresh`, { refreshToken })
+      .pipe(tap((response) => this.persistSession(response)));
+  }
+
   private persistSession(response: AuthResponse): void {
     this.tokenSignal.set(response.accessToken);
     this.userSignal.set(response.user);
     localStorage.setItem(TOKEN_KEY, response.accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
     localStorage.setItem(USER_KEY, JSON.stringify(response.user));
   }
 

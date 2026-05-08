@@ -7,12 +7,18 @@
       <p class="mt-4 text-sm text-slate-300">Merci de patienter...</p>
     }
     @if (status() === 'success') {
-      <a class="mt-6 inline-flex text-sm font-medium text-sky-300 hover:text-sky-200" routerLink="/login">
+      <a
+        class="mt-6 inline-flex text-sm font-medium text-sky-300 hover:text-sky-200"
+        routerLink="/login"
+      >
         Aller à la connexion
       </a>
     }
     @if (status() === 'error') {
-      <a class="mt-6 inline-flex text-sm font-medium text-sky-300 hover:text-sky-200" routerLink="/register">
+      <a
+        class="mt-6 inline-flex text-sm font-medium text-sky-300 hover:text-sky-200"
+        routerLink="/register"
+      >
         Revenir à l’inscription
       </a>
     }

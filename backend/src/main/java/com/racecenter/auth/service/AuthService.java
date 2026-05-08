@@ -15,10 +15,13 @@ import com.racecenter.auth.api.dto.AuthResponse;
 import com.racecenter.auth.api.dto.AuthUserResponse;
 import com.racecenter.auth.api.dto.LoginRequest;
 import com.racecenter.auth.api.dto.MessageResponse;
+import com.racecenter.auth.api.dto.RefreshTokenRequest;
 import com.racecenter.auth.api.dto.RegisterRequest;
-import com.racecenter.auth.domain.Role;
 import com.racecenter.auth.domain.EmailVerificationTokenEntity;
 import com.racecenter.auth.domain.EmailVerificationTokenRepository;
+import com.racecenter.auth.domain.RefreshTokenEntity;
+import com.racecenter.auth.domain.RefreshTokenRepository;
+import com.racecenter.auth.domain.Role;
 import com.racecenter.auth.domain.UserEntity;
 import com.racecenter.auth.domain.UserRepository;
 import com.racecenter.auth.security.JwtService;
@@ -28,16 +31,18 @@ public class AuthService {
 
 	private final UserRepository userRepository;
 	private final EmailVerificationTokenRepository emailVerificationTokenRepository;
+	private final RefreshTokenRepository refreshTokenRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
 	private final EmailVerificationMailer emailVerificationMailer;
 
 	public AuthService(UserRepository userRepository, EmailVerificationTokenRepository emailVerificationTokenRepository,
-			PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager,
-			EmailVerificationMailer emailVerificationMailer) {
+			RefreshTokenRepository refreshTokenRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
+			AuthenticationManager authenticationManager, EmailVerificationMailer emailVerificationMailer) {
 		this.userRepository = userRepository;
 		this.emailVerificationTokenRepository = emailVerificationTokenRepository;
+		this.refreshTokenRepository = refreshTokenRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
 		this.authenticationManager = authenticationManager;
@@ -81,6 +86,22 @@ public class AuthService {
 	}
 
 	@Transactional
+	public AuthResponse refresh(RefreshTokenRequest request) {
+		var storedToken = refreshTokenRepository.findByToken(request.refreshToken())
+				.orElseThrow(() -> new AuthException("Refresh token invalide"));
+		if (storedToken.getRevokedAt() != null) {
+			throw new AuthException("Refresh token révoqué");
+		}
+		if (storedToken.getExpiresAt().isBefore(Instant.now())) {
+			throw new AuthException("Refresh token expiré");
+		}
+
+		storedToken.setRevokedAt(Instant.now());
+		refreshTokenRepository.save(storedToken);
+		return toResponse(storedToken.getUser());
+	}
+
+	@Transactional
 	public MessageResponse verifyEmail(String tokenValue) {
 		var token = emailVerificationTokenRepository.findByToken(tokenValue)
 				.orElseThrow(() -> new AuthException("Token de vérification invalide"));
@@ -110,9 +131,19 @@ public class AuthService {
 	}
 
 	private AuthResponse toResponse(UserEntity user) {
-		var token = jwtService.generateToken(user.getId(), user.getEmail());
+		var accessToken = jwtService.generateToken(user.getId(), user.getEmail());
+		var refreshToken = createRefreshToken(user);
 		var userResponse = new AuthUserResponse(user.getId(), user.getEmail(), user.getUsername(), user.getRole(),
 				user.isEmailVerified());
-		return new AuthResponse(token, "Bearer", userResponse);
+		return new AuthResponse(accessToken, refreshToken, "Bearer", userResponse);
+	}
+
+	private String createRefreshToken(UserEntity user) {
+		var refresh = new RefreshTokenEntity();
+		refresh.setUser(user);
+		refresh.setToken(UUID.randomUUID().toString().replace("-", ""));
+		refresh.setExpiresAt(Instant.now().plus(30, ChronoUnit.DAYS));
+		refreshTokenRepository.save(refresh);
+		return refresh.getToken();
 	}
 }
