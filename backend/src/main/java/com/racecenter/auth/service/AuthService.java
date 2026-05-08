@@ -1,5 +1,9 @@
 package com.racecenter.auth.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,8 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.racecenter.auth.api.dto.AuthResponse;
 import com.racecenter.auth.api.dto.AuthUserResponse;
 import com.racecenter.auth.api.dto.LoginRequest;
+import com.racecenter.auth.api.dto.MessageResponse;
 import com.racecenter.auth.api.dto.RegisterRequest;
 import com.racecenter.auth.domain.Role;
+import com.racecenter.auth.domain.EmailVerificationTokenEntity;
+import com.racecenter.auth.domain.EmailVerificationTokenRepository;
 import com.racecenter.auth.domain.UserEntity;
 import com.racecenter.auth.domain.UserRepository;
 import com.racecenter.auth.security.JwtService;
@@ -20,20 +27,25 @@ import com.racecenter.auth.security.JwtService;
 public class AuthService {
 
 	private final UserRepository userRepository;
+	private final EmailVerificationTokenRepository emailVerificationTokenRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
+	private final EmailVerificationMailer emailVerificationMailer;
 
-	public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
-			AuthenticationManager authenticationManager) {
+	public AuthService(UserRepository userRepository, EmailVerificationTokenRepository emailVerificationTokenRepository,
+			PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager,
+			EmailVerificationMailer emailVerificationMailer) {
 		this.userRepository = userRepository;
+		this.emailVerificationTokenRepository = emailVerificationTokenRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
 		this.authenticationManager = authenticationManager;
+		this.emailVerificationMailer = emailVerificationMailer;
 	}
 
 	@Transactional
-	public AuthResponse register(RegisterRequest request) {
+	public MessageResponse register(RegisterRequest request) {
 		if (userRepository.existsByEmailIgnoreCase(request.email())) {
 			throw new AuthException("Cet e-mail est déjà utilisé");
 		}
@@ -46,8 +58,10 @@ public class AuthService {
 		user.setUsername(request.username().trim());
 		user.setPasswordHash(passwordEncoder.encode(request.password()));
 		user.setRole(Role.USER);
+		user.setEmailVerified(false);
 		var savedUser = userRepository.save(user);
-		return toResponse(savedUser);
+		createAndSendVerificationToken(savedUser);
+		return new MessageResponse("Compte créé. Vérifie ton e-mail pour activer ton compte");
 	}
 
 	public AuthResponse login(LoginRequest request) {
@@ -60,12 +74,45 @@ public class AuthService {
 
 		var user = userRepository.findByEmailIgnoreCase(request.email())
 				.orElseThrow(() -> new AuthException("Identifiants invalides"));
+		if (!user.isEmailVerified()) {
+			throw new AuthException("Compte non vérifié. Vérifie ton e-mail avant de te connecter");
+		}
 		return toResponse(user);
+	}
+
+	@Transactional
+	public MessageResponse verifyEmail(String tokenValue) {
+		var token = emailVerificationTokenRepository.findByToken(tokenValue)
+				.orElseThrow(() -> new AuthException("Token de vérification invalide"));
+
+		if (token.getVerifiedAt() != null) {
+			throw new AuthException("Ce token a déjà été utilisé");
+		}
+		if (token.getExpiresAt().isBefore(Instant.now())) {
+			throw new AuthException("Token expiré");
+		}
+
+		var user = token.getUser();
+		user.setEmailVerified(true);
+		token.setVerifiedAt(Instant.now());
+		userRepository.save(user);
+		emailVerificationTokenRepository.save(token);
+		return new MessageResponse("Adresse e-mail vérifiée avec succès");
+	}
+
+	private void createAndSendVerificationToken(UserEntity user) {
+		var token = new EmailVerificationTokenEntity();
+		token.setUser(user);
+		token.setToken(UUID.randomUUID().toString().replace("-", ""));
+		token.setExpiresAt(Instant.now().plus(24, ChronoUnit.HOURS));
+		emailVerificationTokenRepository.save(token);
+		emailVerificationMailer.sendVerificationEmail(user.getEmail(), token.getToken());
 	}
 
 	private AuthResponse toResponse(UserEntity user) {
 		var token = jwtService.generateToken(user.getId(), user.getEmail());
-		var userResponse = new AuthUserResponse(user.getId(), user.getEmail(), user.getUsername(), user.getRole());
+		var userResponse = new AuthUserResponse(user.getId(), user.getEmail(), user.getUsername(), user.getRole(),
+				user.isEmailVerified());
 		return new AuthResponse(token, "Bearer", userResponse);
 	}
 }

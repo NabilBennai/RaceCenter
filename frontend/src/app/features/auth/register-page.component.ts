@@ -51,9 +51,10 @@ export class RegisterPageComponent {
     const { email, username, password } = this.form.getRawValue();
     this.isLoading.set(true);
     this.authService.register({ email, username, password }).subscribe({
-      next: () => {
-        this.toastr.success('Compte créé avec succès');
-        this.router.navigate(['/dashboard']);
+      next: (response) => {
+        this.authService.logout();
+        this.toastr.success(response.message);
+        this.router.navigate(['/login']);
       },
       error: (error) => {
         this.toastr.error(error?.error?.message ?? 'Impossible de créer le compte');

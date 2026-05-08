@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.racecenter.auth.api.dto.AuthResponse;
 import com.racecenter.auth.api.dto.LoginRequest;
+import com.racecenter.auth.api.dto.MessageResponse;
 import com.racecenter.auth.api.dto.RegisterRequest;
+import com.racecenter.auth.api.dto.VerifyEmailRequest;
 import com.racecenter.auth.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -26,12 +28,17 @@ public class AuthController {
 
 	@PostMapping("/register")
 	@ResponseStatus(HttpStatus.CREATED)
-	public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
+	public MessageResponse register(@Valid @RequestBody RegisterRequest request) {
 		return authService.register(request);
 	}
 
 	@PostMapping("/login")
 	public AuthResponse login(@Valid @RequestBody LoginRequest request) {
 		return authService.login(request);
+	}
+
+	@PostMapping("/verify-email")
+	public MessageResponse verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+		return authService.verifyEmail(request.token());
 	}
 }
