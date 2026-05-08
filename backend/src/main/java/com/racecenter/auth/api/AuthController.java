@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.racecenter.auth.api.dto.AuthResponse;
 import com.racecenter.auth.api.dto.LoginRequest;
 import com.racecenter.auth.api.dto.MessageResponse;
+import com.racecenter.auth.api.dto.RefreshTokenRequest;
 import com.racecenter.auth.api.dto.RegisterRequest;
 import com.racecenter.auth.api.dto.VerifyEmailRequest;
 import com.racecenter.auth.service.AuthService;
@@ -35,6 +36,11 @@ public class AuthController {
 	@PostMapping("/login")
 	public AuthResponse login(@Valid @RequestBody LoginRequest request) {
 		return authService.login(request);
+	}
+
+	@PostMapping("/refresh")
+	public AuthResponse refresh(@Valid @RequestBody RefreshTokenRequest request) {
+		return authService.refresh(request);
 	}
 
 	@PostMapping("/verify-email")
