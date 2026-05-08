@@ -38,6 +38,17 @@ export class AuthService {
     return this.http.post<MessageResponse>(`${environment.apiUrl}/auth/verify-email`, { token });
   }
 
+  forgotPassword(email: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${environment.apiUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(`${environment.apiUrl}/auth/reset-password`, {
+      token,
+      newPassword,
+    });
+  }
+
   logout(): void {
     this.tokenSignal.set(null);
     this.userSignal.set(null);

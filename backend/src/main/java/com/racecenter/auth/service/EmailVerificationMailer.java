@@ -21,9 +21,20 @@ public class EmailVerificationMailer {
 		var verifyLink = frontendBaseUrl + "/verify-email?token=" + token;
 		var message = new SimpleMailMessage();
 		message.setTo(toEmail);
-		message.setSubject("RaceCenter - Vérifie ton e-mail");
+		message.setSubject("RaceCenter - Verifie ton e-mail");
 		message.setText(
-				"Bienvenue sur RaceCenter.\n\nClique sur ce lien pour vérifier ton adresse e-mail:\n" + verifyLink);
+				"Bienvenue sur RaceCenter.\n\nClique sur ce lien pour verifier ton adresse e-mail:\n" + verifyLink);
+		mailSender.send(message);
+	}
+
+	public void sendResetPasswordEmail(String toEmail, String token) {
+		var resetLink = frontendBaseUrl + "/reset-password?token=" + token;
+		var message = new SimpleMailMessage();
+		message.setTo(toEmail);
+		message.setSubject("RaceCenter - Reinitialisation du mot de passe");
+		message.setText(
+				"Tu as demande une reinitialisation de mot de passe.\n\nClique sur ce lien pour definir un nouveau mot de passe:\n"
+						+ resetLink);
 		mailSender.send(message);
 	}
 }

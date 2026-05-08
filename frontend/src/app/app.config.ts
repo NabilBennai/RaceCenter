@@ -6,13 +6,20 @@ import { provideToastr } from 'ngx-toastr';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
+import { errorToastInterceptor } from './core/notifications/error-toast.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorToastInterceptor])),
     provideAnimationsAsync(),
-    provideToastr(),
+    provideToastr({
+      closeButton: true,
+      progressBar: true,
+      timeOut: 4000,
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
+    }),
   ],
 };
