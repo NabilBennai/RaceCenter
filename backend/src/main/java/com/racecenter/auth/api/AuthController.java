@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.racecenter.auth.api.dto.AuthResponse;
+import com.racecenter.auth.api.dto.ForgotPasswordRequest;
 import com.racecenter.auth.api.dto.LoginRequest;
 import com.racecenter.auth.api.dto.MessageResponse;
 import com.racecenter.auth.api.dto.RefreshTokenRequest;
+import com.racecenter.auth.api.dto.ResetPasswordRequest;
 import com.racecenter.auth.api.dto.RegisterRequest;
 import com.racecenter.auth.api.dto.VerifyEmailRequest;
 import com.racecenter.auth.service.AuthService;
@@ -46,5 +48,15 @@ public class AuthController {
 	@PostMapping("/verify-email")
 	public MessageResponse verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
 		return authService.verifyEmail(request.token());
+	}
+
+	@PostMapping("/forgot-password")
+	public MessageResponse forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+		return authService.forgotPassword(request.email());
+	}
+
+	@PostMapping("/reset-password")
+	public MessageResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+		return authService.resetPassword(request.token(), request.newPassword());
 	}
 }
