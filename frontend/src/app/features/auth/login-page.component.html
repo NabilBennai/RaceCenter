@@ -1,0 +1,68 @@
+<section class="auth-shell">
+  <div class="auth-grid login-grid">
+    <aside class="auth-showcase login-showcase">
+      <p class="eyebrow">Plateforme premium</p>
+      <h2>Decisions plus rapides. Interface plus nette.</h2>
+      <p>Retrouve tes performances, tes ligues et tes signaux cles en un seul espace.</p>
+      <div class="showcase-points">
+        <div class="point"><span>●</span> Dashboard clair et oriente performance</div>
+        <div class="point"><span>●</span> Session securisee avec JWT</div>
+        <div class="point"><span>●</span> Experience fluide mobile et desktop</div>
+      </div>
+    </aside>
+
+    <div class="auth-card login-card">
+      <div class="login-head mb-6">
+        <p class="chip">Connexion securisee</p>
+        <h1 class="text-3xl font-bold text-white">Bon retour sur RaceCenter</h1>
+        <p class="mt-1 text-slate-100">Accede a ton espace RaceCenter</p>
+      </div>
+
+      <form [formGroup]="form" class="auth-form" (ngSubmit)="submit()">
+        <label class="field-label" for="email">Email</label>
+        <input class="field-input" id="email" type="email" formControlName="email" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <p class="field-error">Adresse e-mail invalide</p>
+        }
+
+        <label class="field-label" for="password">Mot de passe</label>
+        <div class="relative">
+          <input
+            class="field-input pr-12"
+            id="password"
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+          />
+          <button class="toggle-btn" type="button" (click)="hidePassword.set(!hidePassword())">
+            {{ hidePassword() ? 'Afficher' : 'Masquer' }}
+          </button>
+        </div>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <p class="field-error">8 caracteres minimum</p>
+        }
+
+        <button class="submit-btn" type="submit" [disabled]="isLoading()">
+          {{ isLoading() ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <p class="text-xs text-slate-300">Connexion chiffree • Session stateless JWT</p>
+        <div class="flex gap-3">
+          <a
+            class="inline-block text-sm font-medium text-sky-300 hover:text-sky-200"
+            routerLink="/forgot-password"
+          >
+            Mot de passe oublie
+          </a>
+          <a
+            class="inline-block text-sm font-medium text-sky-300 hover:text-sky-200"
+            routerLink="/register"
+          >
+            Inscription
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+<header class="toolbar">
+  <div class="toolbar-inner">
+    <a class="brand" routerLink="/dashboard">RaceCenter</a>
+    <span class="spacer"></span>
+    @if (isAuthenticated()) {
+    <span class="user-pill">{{ currentUser()?.username }}</span>
+    <button class="btn btn-outline text-white" type="button" (click)="logout()">
+      Se déconnecter
+    </button>
+    } @else {
+    <a class="btn btn-ghost text-white" routerLink="/login">Connexion</a>
+    <a class="btn btn-primary" routerLink="/register">Créer un compte</a>
+    }
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>

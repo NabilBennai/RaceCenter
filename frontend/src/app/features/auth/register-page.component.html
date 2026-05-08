@@ -1,0 +1,77 @@
+<section class="auth-shell">
+  <div class="auth-grid">
+    <aside class="auth-showcase">
+      <p class="eyebrow">Nouveau sur RaceCenter</p>
+      <h2>Crée ton compte en moins d’une minute.</h2>
+      <p>Accède à un dashboard moderne pour suivre tes résultats et tes classements.</p>
+    </aside>
+
+    <div class="auth-card">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-white">Créer un compte</h1>
+        <p class="mt-1 text-slate-100">Rejoins RaceCenter pour lancer tes pronostics</p>
+      </div>
+
+      <form [formGroup]="form" class="auth-form" (ngSubmit)="submit()">
+        <label class="field-label" for="email">Email</label>
+        <input class="field-input" id="email" type="email" formControlName="email" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <p class="field-error">Adresse e-mail invalide</p>
+        }
+
+        <label class="field-label" for="username">Nom d'utilisateur</label>
+        <input class="field-input" id="username" formControlName="username" />
+        @if (form.controls.username.touched && form.controls.username.invalid) {
+          <p class="field-error">3-30 caractères, lettres/chiffres/_ uniquement</p>
+        }
+
+        <label class="field-label" for="password">Mot de passe</label>
+        <div class="relative">
+          <input
+            class="field-input pr-12"
+            id="password"
+            [type]="hidePassword() ? 'password' : 'text'"
+            formControlName="password"
+          />
+          <button class="toggle-btn" type="button" (click)="hidePassword.set(!hidePassword())">
+            {{ hidePassword() ? 'Afficher' : 'Masquer' }}
+          </button>
+        </div>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <p class="field-error">8 caractères minimum</p>
+        }
+
+        <label class="field-label" for="confirmPassword">Confirmer le mot de passe</label>
+        <div class="relative">
+          <input
+            class="field-input pr-12"
+            id="confirmPassword"
+            [type]="hidePasswordConfirm() ? 'password' : 'text'"
+            formControlName="confirmPassword"
+          />
+          <button
+            class="toggle-btn"
+            type="button"
+            (click)="hidePasswordConfirm.set(!hidePasswordConfirm())"
+          >
+            {{ hidePasswordConfirm() ? 'Afficher' : 'Masquer' }}
+          </button>
+        </div>
+        @if (passwordsMismatch() && form.controls.confirmPassword.touched) {
+          <p class="field-error">Les mots de passe ne correspondent pas</p>
+        }
+
+        <button class="submit-btn" type="submit" [disabled]="isLoading()">
+          {{ isLoading() ? 'Création...' : 'Créer mon compte' }}
+        </button>
+      </form>
+
+      <a
+        class="mt-5 inline-block text-sm font-medium text-sky-300 hover:text-sky-200"
+        routerLink="/login"
+      >
+        Déjà inscrit ? Connexion
+      </a>
+    </div>
+  </div>
+</section>
