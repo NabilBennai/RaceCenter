@@ -39,6 +39,18 @@ public class UserEntity {
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private Instant createdAt;
 
+	@Column(length = 500)
+	private String bio;
+
+	@Column(name = "favorite_team", length = 100)
+	private String favoriteTeam;
+
+	@Column(name = "favorite_driver", length = 100)
+	private String favoriteDriver;
+
+	@Column(name = "favorite_constructor", length = 100)
+	private String favoriteConstructor;
+
 	@PrePersist
 	void onCreate() {
 		if (createdAt == null) {
@@ -88,5 +100,37 @@ public class UserEntity {
 
 	public void setEmailVerified(boolean emailVerified) {
 		this.emailVerified = emailVerified;
+	}
+
+	public String getBio() {
+		return bio;
+	}
+
+	public void setBio(String bio) {
+		this.bio = bio;
+	}
+
+	public String getFavoriteTeam() {
+		return favoriteTeam;
+	}
+
+	public void setFavoriteTeam(String favoriteTeam) {
+		this.favoriteTeam = favoriteTeam;
+	}
+
+	public String getFavoriteDriver() {
+		return favoriteDriver;
+	}
+
+	public void setFavoriteDriver(String favoriteDriver) {
+		this.favoriteDriver = favoriteDriver;
+	}
+
+	public String getFavoriteConstructor() {
+		return favoriteConstructor;
+	}
+
+	public void setFavoriteConstructor(String favoriteConstructor) {
+		this.favoriteConstructor = favoriteConstructor;
 	}
 }

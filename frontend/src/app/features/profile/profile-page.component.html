@@ -1,0 +1,86 @@
+<section class="profile-shell">
+  <div class="profile-card">
+    <h1 class="title">Mon profil</h1>
+
+    @if (profile(); as me) {
+      <div class="profile-grid">
+        <div class="field">
+          <p class="label">Nom d'utilisateur</p>
+          <p class="value">{{ me.username }}</p>
+        </div>
+        <div class="field">
+          <p class="label">E-mail</p>
+          <p class="value">{{ me.email }}</p>
+        </div>
+        <div class="field field-wide">
+          <p class="label">Bio</p>
+          <p class="value">{{ me.bio || 'Aucune bio renseignée.' }}</p>
+        </div>
+      </div>
+
+      <h2 class="subtitle">Préférences</h2>
+      <div class="profile-grid">
+        <div class="field">
+          <p class="label">Équipe favorite</p>
+          <p class="value">{{ me.preferences.favoriteTeam || 'Non renseigné' }}</p>
+        </div>
+        <div class="field">
+          <p class="label">Pilote favori</p>
+          <p class="value">{{ me.preferences.favoriteDriver || 'Non renseigné' }}</p>
+        </div>
+        <div class="field">
+          <p class="label">Constructeur favori</p>
+          <p class="value">{{ me.preferences.favoriteConstructor || 'Non renseigné' }}</p>
+        </div>
+      </div>
+
+      <h2 class="subtitle">Statistiques basiques</h2>
+      <div class="stats-grid">
+        <div class="stat">
+          <p class="label">Session</p>
+          <p class="value">Active</p>
+        </div>
+        <div class="stat">
+          <p class="label">Préférences remplies</p>
+          <p class="value">{{ filledPreferencesCount(me) }}/3</p>
+        </div>
+      </div>
+
+      <h2 class="subtitle">Modifier mon profil</h2>
+      <form class="edit-form" [formGroup]="form" (ngSubmit)="saveProfile()">
+        <label class="field field-wide">
+          <span class="label">Bio</span>
+          <textarea
+            class="input"
+            rows="4"
+            formControlName="bio"
+            maxlength="500"
+            placeholder="Parle un peu de toi"
+          ></textarea>
+          <span class="hint">{{ form.controls.bio.value?.length ?? 0 }}/500</span>
+        </label>
+
+        <label class="field">
+          <span class="label">Équipe favorite</span>
+          <input class="input" type="text" formControlName="favoriteTeam" maxlength="100" />
+        </label>
+
+        <label class="field">
+          <span class="label">Pilote favori</span>
+          <input class="input" type="text" formControlName="favoriteDriver" maxlength="100" />
+        </label>
+
+        <label class="field">
+          <span class="label">Constructeur favori</span>
+          <input class="input" type="text" formControlName="favoriteConstructor" maxlength="100" />
+        </label>
+
+        <button class="save-btn" type="submit" [disabled]="isSaving()">
+          {{ isSaving() ? 'Sauvegarde...' : 'Sauvegarder' }}
+        </button>
+      </form>
+    } @else {
+      <p class="loading">Chargement du profil...</p>
+    }
+  </div>
+</section>

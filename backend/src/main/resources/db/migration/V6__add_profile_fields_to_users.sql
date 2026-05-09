@@ -1,0 +1,4 @@
+ALTER TABLE users ADD COLUMN bio VARCHAR(500);
+ALTER TABLE users ADD COLUMN favorite_team VARCHAR(100);
+ALTER TABLE users ADD COLUMN favorite_driver VARCHAR(100);
+ALTER TABLE users ADD COLUMN favorite_constructor VARCHAR(100);
